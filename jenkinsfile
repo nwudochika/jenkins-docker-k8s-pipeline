@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKERHUB_REPO = 'nwudofidelis/custom-apache'
+        DOCKERHUB_CREDS = credentials('DockerHub-creds')
+    }
+
+    stages {
+        stage('Source') {
+            steps {
+                echo 'Login to GitHub account'
+                git branch: 'main', credentialsId: 'GitHub-creds', url: 'https://github.com/nwudochika/jenkins-docker-k8s-pipeline.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Building docker image'
+                sh 'whoami'
+                sh 'docker build -t ${DOCKERHUB_REPO}:v${BUILD_NUMBER} .'
+                sh 'docker images'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'running container'
+                sh 'docker run --name mycustom-apache-v${BUILD_NUMBER} -dit -p 80:80 ${DOCKERHUB_REPO}:v${BUILD_NUMBER}'
+            }
+        }
+        stage('Manual Approval') {
+            steps {
+                echo 'This is for manual approval'
+                input 'Validate the deployment of the container'
+            }
+        }
+        stage('Deploy to DockerHub') {
+            steps {
+                echo 'Deploying image to DockerHub'
+                sh 'docker login -u ${DOCKERHUB_CREDS_USR} -p ${DOCKERHUB_CREDS_PSW}'
+                sh 'docker push  ${DOCKERHUB_REPO}:v${BUILD_NUMBER}'
+            }
+        }
+        stage('Deploy to EKS') {
+            steps {
+                echo 'Testing the connectivity to the cluster'
+                sh 'kubectl get nodes'
+                sh 'kubectl apply -f Deployment-manifest-file.yml'
+                sh 'kubectl apply -f LoadBalancerservice-ManifestFile.yml'
+            }
+        }
+    }
+    post { 
+        always { 
+            echo 'Stopping and Deleting the container'
+            sh 'docker stop mycustom-apache-v${BUILD_NUMBER}'
+            sh 'docker rm mycustom-apache-v${BUILD_NUMBER}'
+            sh 'docker logout'
+        }
+    }
+}
