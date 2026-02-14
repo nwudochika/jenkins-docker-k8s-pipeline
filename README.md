@@ -63,7 +63,9 @@ jenkins-docker-k8s-pipeline/
 ├── Deployment-manifest-file.yml   # Kubernetes Deployment
 ├── LoadBalancerservice-ManifestFile.yml  # Kubernetes LoadBalancer Service
 ├── images/
-│   └── Projectflow.png            # Pipeline architecture diagram
+│   ├── Projectflow.png            # Pipeline architecture diagram
+│   ├── jenkins-stage-view.png     # Jenkins pipeline stage view
+│   └── deployed-app.png           # Deployed application screenshot
 └── README.md
 ```
 
@@ -79,6 +81,10 @@ jenkins-docker-k8s-pipeline/
 | **Manual Approval** | Wait for human approval before deployment |
 | **Deploy to DockerHub** | Push image to Docker Hub |
 | **Deploy to EKS** | Apply Kubernetes manifests to EKS cluster |
+
+### Jenkins Stage View
+
+![Jenkins Stage View](./images/StageView.png)
 
 ---
 
@@ -104,9 +110,6 @@ cd jenkins-docker-k8s-pipeline
 
 Ensure the Jenkins server can access your EKS cluster:
 
-```bash
-aws eks update-kubeconfig --name <your-cluster-name> --region <region>
-```
 
 ---
 
@@ -117,9 +120,6 @@ aws eks update-kubeconfig --name <your-cluster-name> --region <region>
 3. After manual approval, the application deploys to EKS
 4. Access the application via the LoadBalancer external URL:
 
-```bash
-kubectl get svc apache-loadbalancer-service
-```
 
 ---
 
@@ -127,9 +127,8 @@ kubectl get svc apache-loadbalancer-service
 
 The deployed application serves a simple welcome page:
 
-![Deployed Application](./images/deployed-app.png)
+![Deployed Application](./images/Deployed%20Image%20app%20while%20testing%20with%20Loadbalancer%20DNS.png)
 
-*Add a screenshot of your running application to `images/deployed-app.png` for better documentation.*
 
 ---
 
