@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: apache-container
-        image: nwudofidelis/jenkins-image:v25
+        image: nwudofidelis/custom-apache:v16
         ports:
         - containerPort: 80
